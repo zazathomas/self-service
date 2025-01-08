@@ -8,12 +8,12 @@ jobs:
       image: alpine
     steps:
       - name: Create file
-        run: mkdir test-folder && touch test-folder/touch.txt
+        run: mkdir test-folder-2 && touch test-folder-2/touch.txt
       - name: upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: folder
-          path: test-folder/
+          path: test-folder-2/
 
   sample:
     needs: test-job
@@ -28,5 +28,5 @@ jobs:
       - name: check
         run: |
           ls -l
-          ls test-folder/
+          ls test-folder-2/
           cat /etc/os-release
