@@ -1,11 +1,29 @@
-name: CI
+name: Test
 on:
   workflow_dispatch:
 jobs:
-  container-test-job:
+  test-job:
     runs-on: infra-node
     container:
       image: alpine
     steps:
-      - name: Get IP
-        run: ip a
+      - name: Create file
+        run: mkdir test-folder && touch test-folder/touch.txt
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: folder
+          path: test-folder/
+
+  sample:
+    needs: test-job
+    runs-on: infra-node
+    container:
+      image: alpine
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: folder
+      - name: check
+        run: ls -l && cat test-folder/touch.txt
