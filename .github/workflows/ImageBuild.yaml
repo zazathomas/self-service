@@ -24,7 +24,7 @@ on:
         default: 'latest'
 
 jobs:
-  BuidImage:
+  BuildImage:
     runs-on: infra-node
     container:
       image: gcr.io/kaniko-project/executor:debug
@@ -41,16 +41,24 @@ jobs:
     steps:
       - name: Set kaniko credentials
         run: |
-        echo "\"auths\": {\"https://$REGISTRY\": \"username\": \"$GH_USERNAME\", \"password\": \"$GH_PASSWORD\"}}}" > /kaniko/.docker/config.json
-      - name: Build and Push Image
+          cat <<EOF > /kaniko/.docker/config.json
+          {
+            "auths": {
+              "$REGISTRY": {
+                "auth": "$(echo -n "$GH_USERNAME:$GH_PASSWORD" | base64 -w0)"
+              }
+            }
+          }
+          EOF
+      - name: Build & Push Image
         run: |
-        /kaniko/executor \
-        --context ${KANIKO_CONTEXT} \
-        --dockerfile ${DOCKERFILE_PATH} \
-        --destination ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG} \
-        --destination ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:latest \
-        --cache=true \
-        --skip-tls-verify=true
+          /kaniko/executor \
+          --context ${KANIKO_CONTEXT} \
+          --dockerfile ${DOCKERFILE_PATH} \
+          --destination ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG} \
+          --destination ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:latest \
+          --cache=true \
+          --skip-tls-verify=true
   SignImage:
     needs: BuildImage
     runs-on: infra-node
