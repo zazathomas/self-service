@@ -5,7 +5,7 @@ jobs:
   container-test-job:
     runs-on: infra-node
     container:
-      image: ghcr.io/zazathomas/terraform:1.10.3
+      image: alpine
     steps:
       - name: Get IP
         run: ip a
