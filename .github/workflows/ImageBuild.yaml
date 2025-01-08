@@ -24,6 +24,15 @@ on:
         default: 'latest'
 
 jobs:
+  Clone-Repository:
+    runs-on: infra-node
+    container:
+      image: alpine/git:v2.47.1
+    steps:
+      - name: Cleanup build folder
+        run: ls -la ./ && rm -rf ./* || true && rm -rf ./.??* || true && ls -la ./
+      - name: Git Clone
+        run: git clone ${{ github.event.inputs.GitUrl }} .
   BuildImage:
     runs-on: infra-node
     container:
@@ -32,18 +41,13 @@ jobs:
         REGISTRY: ghcr.io
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
-        GIT_URL: ${{ github.event.inputs.GitUrl }}
         DOCKERFILE_PATH: ${{ github.event.inputs.DockerfilePath }} 
         KANIKO_CONTEXT: ${{ github.event.inputs.KanikoContext }}
         IMAGE_REPOSITORY: ${{ github.event.inputs.ImageRepository }}
         IMAGE_NAME: ${{ github.event.inputs.ImageName }}
         IMAGE_TAG: ${{ github.event.inputs.ImageTag }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          repository: $GIT_URL
-      - name: Set kaniko credentials
+      - name: Configure kaniko credentials
         run: |
           cat <<EOF > /kaniko/.docker/config.json
           {
