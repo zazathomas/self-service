@@ -14,7 +14,7 @@ jobs:
           rm -rf ./.??* || true
           ls -la ./
       - name: Git Clone
-        run: git clone https://github.com/zazathomas/Jenkins-for-DevSecOps.git
+        run: git clone https://github.com/zazathomas/Jenkins-for-DevSecOps.git && && echo "${PWD##*/}"
 
   sample:
     needs: test-job
