@@ -7,6 +7,12 @@ jobs:
     container:
       image: alpine
     steps:
+      - name: Cleanup build folder
+        run: |
+          ls -la ./
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+          ls -la ./
       - name: Create file
         run: mkdir test-folder-2 && touch test-folder-2/touch.txt
       - name: upload artifact
@@ -21,6 +27,12 @@ jobs:
     container:
       image: alpine
     steps:
+      - name: Cleanup build folder
+        run: |
+          ls -la ./
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+          ls -la ./
       - name: download artifact
         uses: actions/download-artifact@v3
         with:
