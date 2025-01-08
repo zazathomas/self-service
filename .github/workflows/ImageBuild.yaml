@@ -24,7 +24,7 @@ on:
         default: 'latest'
 
 jobs:
-  Clone-Repository:
+  CloneRepository:
     runs-on: infra-node
     container:
       image: alpine/git:v2.47.1
@@ -34,6 +34,7 @@ jobs:
       - name: Git Clone
         run: git clone ${{ github.event.inputs.GitUrl }} .
   BuildImage:
+    needs: CloneRepository
     runs-on: infra-node
     container:
       image: gcr.io/kaniko-project/executor:debug
