@@ -1,0 +1,75 @@
+name: ImageBuildPipeline
+on:
+  workflow_dispatch:
+   inputs:
+      GitUrl:
+        description: 'Git url containing the dockerfile'
+        required: true
+      DockerfilePath:
+        description: 'Path to dockerfile'
+        required: true
+      KanikoContext:
+        description: 'Kaniko Context'
+        required: true
+      ImageRepository:
+        description: 'Image Repository'
+        required: true
+        default: 'zazathomas'
+      ImageName:
+        description: 'Image name to build'
+        required: true
+      ImageTag:
+        description: 'Image Tag'
+        required: true
+        default: 'latest'
+
+jobs:
+  BuidImage:
+    runs-on: infra-node
+    container:
+      image: gcr.io/kaniko-project/executor:debug
+      env:
+        REGISTRY: ghcr.io
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
+        GIT_URL: ${{ github.event.inputs.GitUrl }}
+        DOCKERFILE_PATH: ${{ github.event.inputs.DockerfilePath }} 
+        KANIKO_CONTEXT: ${{ github.event.inputs.KanikoContext }}
+        IMAGE_REPOSITORY: ${{ github.event.inputs.ImageRepository }}
+        IMAGE_NAME: ${{ github.event.inputs.ImageName }}
+        IMAGE_TAG: ${{ github.event.inputs.ImageTag }}
+    steps:
+      - name: Set kaniko credentials
+        run: |
+        echo "\"auths\": {\"https://$REGISTRY\": \"username\": \"$GH_USERNAME\", \"password\": \"$GH_PASSWORD\"}}}" > /kaniko/.docker/config.json
+      - name: Build and Push Image
+        run: |
+        /kaniko/executor \
+        --context ${KANIKO_CONTEXT} \
+        --dockerfile ${DOCKERFILE_PATH} \
+        --destination ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG} \
+        --destination ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:latest \
+        --cache=true \
+        --skip-tls-verify=true
+  SignImage:
+    needs: BuildImage
+    runs-on: infra-node
+    container:
+      image: jitesoft/cosign:v2.4.1
+      env:
+        REGISTRY: ghcr.io
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
+        COSIGN_PRIVATE_KEY: ${{ secret.COSIGN_PRIVATE_KEY }}
+        COSIGN_PUBLIC_KEY: ${{ secret.COSIGN_PUBLIC_KEY }}
+        IMAGE_REPOSITORY: ${{ github.event.inputs.ImageRepository }}
+        IMAGE_NAME: ${{ github.event.inputs.ImageName }}
+        IMAGE_TAG: ${{ github.event.inputs.ImageTag }}
+    steps:
+      - name: Login to Registry
+        run: echo ${GH_PASSWORD} | cosign login ${REGISTRY} -u ${GH_USERNAME} --password-stdin 
+      - name: Sign Image
+        run: COSIGN_PASSWORD="" cosign sign --key $COSIGN_PRIVATE_KEY ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG} -y
+      - name: Verify Image Signature
+        run: COSIGN_PASSWORD="" cosign verify --key $COSIGN_PUBLIC_KEY ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
+    
