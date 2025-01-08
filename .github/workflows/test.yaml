@@ -26,4 +26,7 @@ jobs:
         with:
           name: folder
       - name: check
-        run: ls -l && cat test-folder/touch.txt
+        run: |
+          ls -l
+          ls test-folder/
+          cat /etc/os-release
