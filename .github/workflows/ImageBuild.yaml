@@ -39,6 +39,10 @@ jobs:
         IMAGE_NAME: ${{ github.event.inputs.ImageName }}
         IMAGE_TAG: ${{ github.event.inputs.ImageTag }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: $GIT_URL
       - name: Set kaniko credentials
         run: |
           cat <<EOF > /kaniko/.docker/config.json
