@@ -25,5 +25,3 @@ jobs:
       - name: check
         run: |
           ls -l
-          cd Jenkins-for-DevSecOps
-          ls -l
