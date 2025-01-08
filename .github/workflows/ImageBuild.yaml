@@ -72,8 +72,8 @@ jobs:
         REGISTRY: ghcr.io
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
-        COSIGN_PRIVATE_KEY: ${{ secret.COSIGN_PRIVATE_KEY }}
-        COSIGN_PUBLIC_KEY: ${{ secret.COSIGN_PUBLIC_KEY }}
+        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        COSIGN_PUBLIC_KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
         IMAGE_REPOSITORY: ${{ github.event.inputs.ImageRepository }}
         IMAGE_NAME: ${{ github.event.inputs.ImageName }}
         IMAGE_TAG: ${{ github.event.inputs.ImageTag }}
