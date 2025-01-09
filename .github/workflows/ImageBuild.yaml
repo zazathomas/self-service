@@ -77,8 +77,6 @@ jobs:
         REGISTRY: ghcr.io
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
         GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
-        COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-        COSIGN_PUBLIC_KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
         IMAGE_REPOSITORY: ${{ github.event.inputs.ImageRepository }}
         IMAGE_NAME: ${{ github.event.inputs.ImageName }}
         IMAGE_TAG: ${{ github.event.inputs.ImageTag }}
@@ -87,10 +85,10 @@ jobs:
         run: echo ${GH_PASSWORD} | cosign login ${REGISTRY} -u ${GH_USERNAME} --password-stdin 
       - name: Sign Image
         run: |
-          echo $COSIGN_PRIVATE_KEY > cosign.key && chmod 600 cosign.key
+          echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key && chmod 600 cosign.key
           COSIGN_PASSWORD="" cosign sign --key cosign.key ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG} -y
       - name: Verify Image Signature
         run: |
-          echo $COSIGN_PUBLIC_KEY > cosign.pub && chmod 600 cosign.pub
+          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub && chmod 600 cosign.pub
           COSIGN_PASSWORD="" cosign verify --key cosign.pub ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
     
