@@ -27,7 +27,7 @@ jobs:
   CloneRepository:
     runs-on: infra-node
     container:
-      image: ghcr.io/zazathomas/git:latest
+      image: alpine/git:v2.47.1
     steps:
       - name: Git Clone
         run: git clone ${{ github.event.inputs.GitUrl }} .
