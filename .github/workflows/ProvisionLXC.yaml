@@ -1,0 +1,70 @@
+name: ProvisionLXC
+on:
+  workflow_dispatch:
+   inputs:
+      Hostname:
+        description: 'Hostname of LXC container'
+        required: true
+      Vmid:
+        description: 'VMID of LXC container'
+        required: true
+        default: "0"
+      Memory:
+        description: 'RAM size to allocate to LXC'
+        required: true
+        default: '2048'
+      Cores:
+        description: 'Cores to allocate to LXC'
+        required: true
+        default: '4'
+      DiskSize:
+        description: 'Size of LXC disk'
+        required: true
+        default: '2G'
+      Swap:
+        description: 'Swap to allocate to LXC'
+        required: true
+        default: '256'
+
+jobs:
+  CloneRepository:
+    runs-on: infra-node
+    container:
+      image: alpine/git:v2.47.1
+    steps:
+      - name: Git Clone
+        run: git clone https://github.com/zazathomas/compliance-as-code.git .
+  RunTerraform:
+    needs: CloneRepository
+    runs-on: infra-node
+    container:
+      image: ghcr.io/zazathomas/terraform:1.10.3
+      env:
+        TF_VAR_hostname: ${{ github.event.inputs.Hostname }} 
+        TF_VAR_vmid: ${{ github.event.inputs.Vmid }}
+        TF_VAR_cores: ${{ github.event.inputs.Cores }} 
+        TF_VAR_memory: ${{ github.event.inputs.Cores }}
+        TF_VAR_swap: ${{ github.event.inputs.Cores }} 
+        TF_VAR_disk_size: ${{ github.event.inputs.DiskSize }}
+        TF_VAR_cipassword: ${{ secrets.CIPASSWORD }}
+        TF_VAR_proxmox_api_secret: ${{ secrets.PROXMOX_API_SECRET }}
+        TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
+    steps:
+      - name: Prepare directory
+        run: cd terraform/proxmox/lxc && mkdir -p ~/.ssh && echo '${{ secrets.SSH_PUBLIC_KEY }}' > ~/.ssh/id_rsa.pub
+      - name: Terraform init
+        run: terraform init
+      - name: Terraform Plan
+        run: terraform plan
+      - name: Terraform Apply
+        run: terraform apply --auto-approve
+
+  CleanWS:
+    needs: RunTerraform
+    runs-on: infra-node
+    container:
+      image: alpine/git:v2.47.1
+    steps:
+      - name: Cleanup build folder
+        run: ls -la ./ && rm -rf ./* || true && rm -rf ./.??* || true && ls -la ./
+    
