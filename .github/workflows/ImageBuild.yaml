@@ -93,6 +93,7 @@ jobs:
   CleanWS:
     needs: SignImage
     runs-on: infra-node
+    if: always()
     container:
       image: alpine/git:v2.47.1
     steps:
