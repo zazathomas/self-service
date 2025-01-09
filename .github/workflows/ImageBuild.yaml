@@ -27,10 +27,8 @@ jobs:
   CloneRepository:
     runs-on: infra-node
     container:
-      image: alpine/git:v2.47.1
+      image: ghcr.io/zazathomas/git:latest
     steps:
-      - name: Cleanup build folder
-        run: ls -la ./ && rm -rf ./* || true && rm -rf ./.??* || true && ls -la ./
       - name: Git Clone
         run: git clone ${{ github.event.inputs.GitUrl }} .
   BuildImage:
