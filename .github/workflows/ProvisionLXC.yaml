@@ -51,7 +51,7 @@ jobs:
         TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
     steps:
       - name: Prepare directory
-        run: cd terraform/proxmox/lxc && mkdir -p ~/.ssh && echo '${{ secrets.SSH_PUBLIC_KEY }}' > ~/.ssh/id_rsa.pub
+        run: cd terraform/proxmox/lxc && mkdir -p ~/.ssh && echo '${{ secrets.SSH_PUBLIC_KEY }}' > ~/.ssh/id_rsa.pub && pwd && ls -al
       - name: Terraform init
         run: terraform init
       - name: Terraform Plan
