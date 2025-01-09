@@ -86,7 +86,11 @@ jobs:
       - name: Login to Registry
         run: echo ${GH_PASSWORD} | cosign login ${REGISTRY} -u ${GH_USERNAME} --password-stdin 
       - name: Sign Image
-        run: COSIGN_PASSWORD="" cosign sign --key $COSIGN_PRIVATE_KEY ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG} -y
+        run: |
+          echo $COSIGN_PRIVATE_KEY > cosign.key && chmod 600 cosign.key
+          COSIGN_PASSWORD="" cosign sign --key cosign.key ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG} -y
       - name: Verify Image Signature
-        run: COSIGN_PASSWORD="" cosign verify --key $COSIGN_PUBLIC_KEY ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
+        run: |
+          echo $COSIGN_PUBLIC_KEY > cosign.pub && chmod 600 cosign.pub
+          COSIGN_PASSWORD="" cosign verify --key cosign.pub ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
     
