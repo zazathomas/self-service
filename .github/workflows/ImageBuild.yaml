@@ -91,6 +91,13 @@ jobs:
         run: |
           echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub && chmod 600 cosign.pub
           COSIGN_PASSWORD="" cosign verify --key cosign.pub ${REGISTRY}/${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
+
+  CleanWS:
+    needs: SignImage
+    runs-on: infra-node
+    container:
+      image: alpine/git:v2.47.1
+    steps:
       - name: Cleanup build folder
         run: ls -la ./ && rm -rf ./* || true && rm -rf ./.??* || true && ls -la ./
     
