@@ -30,7 +30,7 @@ jobs:
       image: ghcr.io/zazathomas/git:latest
     steps:
       - name: Git Clone
-        run: git clone ${{ github.event.inputs.GitUrl }} .
+        run: git clone ${{ github.event.inputs.GitUrl }}
   BuildImage:
     needs: CloneRepository
     runs-on: infra-node
