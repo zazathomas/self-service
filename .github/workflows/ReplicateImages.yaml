@@ -1,0 +1,43 @@
+name: ImageBuildPipeline
+on:
+  workflow_dispatch:
+   inputs:
+      SourceRegistry:
+        description: 'Registry for image to replicate'
+        required: true
+        default: 'docker.io'
+      SourceImage:
+        description: 'Image to replicate'
+        required: true
+      SourceTag:
+        description: 'Source image tag'
+        required: true
+      DestinationTag:
+        description: 'Destination Image Tag'
+        required: true
+        default: 'latest'
+
+jobs:
+  ReplicateImages:
+    runs-on: infra-node
+    container:
+      image: gcr.io/go-containerregistry/crane:debug
+      env:
+        REGISTRY: ghcr.io
+        GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        GH_PASSWORD: ${{ secrets.GH_PASSWORD }}
+        SOURCE_REGISTRY: ${{ github.event.inputs.SourceRegistry }}
+        SOURCE_IMAGE: ${{ github.event.inputs.SourceImage }}
+        SOURCE_TAG: ${{ github.event.inputs.SourceTag }}
+        DESTINATION_TAG: ${{ github.event.inputs.DestinationTag }}
+        DESTINATION_REPOSITORY: zazathomas
+    steps:
+      - name: Cleanup build folder
+        run: ls -la ./ && rm -rf ./* || true && rm -rf ./.??* || true && ls -la ./
+      - name: Login to registry
+        run: echo ${GH_PASSWORD} | crane auth login ${REGISTRY} -u ${GH_USERNAME} --password-stdin
+      - name: Replicate Image
+        run: |
+          crane copy ${SOURCE_REGISTRY}/${SOURCE_IMAGE}:${SOURCE_TAG} ${REGISTRY}/${DESTINATION_REPOSITORY}/${SOURCE_IMAGE}:${DESTINATION_TAG}
+
+    
