@@ -1,4 +1,4 @@
-name: ImageBuildPipeline
+name: ReplicateImages
 on:
   workflow_dispatch:
    inputs:
