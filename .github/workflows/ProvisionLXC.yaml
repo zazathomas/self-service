@@ -38,7 +38,7 @@ jobs:
     needs: CloneRepository
     runs-on: infra-node
     container:
-      image: ghcr.io/zazathomas/terraform:1.10.3
+      image: vydev/terraform:1.10.2
       env:
         TF_VAR_hostname: ${{ github.event.inputs.Hostname }} 
         TF_VAR_vmid: ${{ github.event.inputs.Vmid }}
