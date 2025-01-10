@@ -46,6 +46,7 @@ jobs:
         TF_VAR_memory: ${{ github.event.inputs.Cores }}
         TF_VAR_swap: ${{ github.event.inputs.Cores }} 
         TF_VAR_disk_size: ${{ github.event.inputs.DiskSize }}
+        TF_VAR_ciuser: ${{ secrets.CIUSER }}
         TF_VAR_cipassword: ${{ secrets.CIPASSWORD }}
         TF_VAR_proxmox_api_secret: ${{ secrets.PROXMOX_API_SECRET }}
         TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
