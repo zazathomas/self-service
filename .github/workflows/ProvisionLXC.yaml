@@ -50,14 +50,12 @@ jobs:
         TF_VAR_proxmox_api_secret: ${{ secrets.PROXMOX_API_SECRET }}
         TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
     steps:
-      - name: Prepare directory
-        run: cd terraform/proxmox/lxc && mkdir -p ~/.ssh && echo '${{ secrets.SSH_PUBLIC_KEY }}' > ~/.ssh/id_rsa.pub && pwd && ls -al
-      - name: Terraform init
-        run: terraform init
-      - name: Terraform Plan
-        run: terraform plan
-      - name: Terraform Apply
-        run: terraform apply --auto-approve
+      - name: Run Terraform Operations
+        run: |
+          cd terraform/proxmox/lxc && mkdir -p ~/.ssh && echo '${{ secrets.SSH_PUBLIC_KEY }}' > ~/.ssh/id_rsa.pub
+          terraform init
+          terraform plan
+          terraform apply --auto-approve
 
   CleanWS:
     needs: RunTerraform
