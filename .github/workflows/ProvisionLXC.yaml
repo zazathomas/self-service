@@ -43,7 +43,7 @@ jobs:
         TF_VAR_hostname: ${{ github.event.inputs.Hostname }} 
         TF_VAR_vmid: ${{ github.event.inputs.Vmid }}
         TF_VAR_cores: ${{ github.event.inputs.Cores }} 
-        TF_VAR_memory: ${{ github.event.inputs.Cores }}
+        TF_VAR_memory: ${{ github.event.inputs.Memory }}
         TF_VAR_swap: ${{ github.event.inputs.Cores }} 
         TF_VAR_disk_size: ${{ github.event.inputs.DiskSize }}
         TF_VAR_ciuser: ${{ secrets.CIUSER }}
