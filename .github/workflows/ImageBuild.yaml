@@ -70,7 +70,7 @@ jobs:
     needs: BuildImage
     runs-on: infra-node
     container:
-      image: jitesoft/cosign:v2.4.1
+      image: ghcr.io/zazathomas/cosign:latest
       env:
         REGISTRY: ghcr.io
         GH_USERNAME: ${{ secrets.GH_USERNAME }}
